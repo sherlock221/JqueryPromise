@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <script type="text/javascript" src="../lib/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../lib/http_service.js"></script>
+    <title>jquery基本promise的使用方式</title>
+
+</head>
+<body>
+
+
+    <div class="">
+        <form >
+
+            <h3>登录->获得用户信息->获得用户积分->检测是否需要充值</h3>
+
+            <input type="text"   id="userName" name="userName" placeholder="userName"  value="隔壁老王" />
+            <input type="text"   id="passWord" name="passWord" placeholder="passWord"  value="62220"/>
+
+            <button type="button" onclick="sub();">登录</button>
+
+            <div id="progress">
+
+            </div>
+
+        </form>
+
+
+    </div>
+
+
+
+    <script type="text/javascript">
+
+
+
+        //resolve  会触发done的执行
+        //reject  会触发fail的执行
+        //notify  会触发progress的执行
+
+        //promise 的4个主要的方法  done fail progress then always(无论对象是resolve ｜｜reject 都会返回 )
+
+
+        var sub  = function(){
+            var userName = $("#userName").val().trim();
+            var passWord = $("#passWord").val().trim();
+
+            //登录获得token
+            login(userName,passWord)
+
+                    //获得用户信息(根据token)
+                    .then(function(loginUser){
+                        return getUserInfo(loginUser.token);
+                    })
+
+                      //获得积分(根据用户id)
+                    .then(function(userInfo){
+                        return getCredit(userInfo.userId);
+                    })
+
+                    //是否需要充值
+                    .then(function(credit){
+                        return isRecharge(credit);
+                    })
+                     //最后结果
+                    .done(function(isRe){
+                        console.log(isRe);
+                        if(isRe == 0){
+                            alert("不需要充值!");
+                        }
+                        else if(isRe == 1){
+                            alert("请充值");
+                        }
+                        else{
+                            console.log("错误!");
+                        }
+                    })
+                    //任意一步 出现错误
+                    .fail(function(ob,name,error){
+                        console.error(error.stack);
+                    });
+
+        }
+
+    </script>
+
+
+
+</body>
+</html>
